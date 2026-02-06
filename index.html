@@ -3,8 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atomic Structure Visualizer</title>
+    <title>NeuroHub - Understanding Brain, Hormones & Human Behavior</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --accent-soft: #f39c6b;
+            --text: #eaeaea;
+            --text-dim: #a0a0a0;
+            --bg-dark: #0f0f1e;
+            --card-bg: #1f1f3a;
+            --border: rgba(233, 69, 96, 0.2);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -12,699 +26,1122 @@
         }
         
         body {
-            font-family: 'Arial', 'Helvetica', sans-serif;
-            background: #0a0e27;
-            color: #e0e0e0;
-            min-height: 100vh;
-            padding: 0;
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--primary) 100%);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
         }
         
-        .header {
-            background: linear-gradient(135deg, #1a1f3a 0%, #0f1229 100%);
-            padding: 25px 40px;
-            border-bottom: 1px solid #2a3f5f;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-        
-        .header h1 {
-            font-size: 1.8em;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: #ffffff;
-        }
-        
-        .header p {
-            color: #8a9bb3;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-        
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 30px 40px;
-        }
-        
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 420px;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .canvas-section {
-            background: #151b2e;
-            border: 1px solid #2a3f5f;
-            border-radius: 8px;
-            padding: 30px;
-        }
-        
-        .section-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #ffffff;
-            border-bottom: 1px solid #2a3f5f;
-            padding-bottom: 10px;
-        }
-        
-        #atomCanvas {
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
             width: 100%;
-            height: 550px;
-            border-radius: 4px;
-            background: #0a0e27;
-            border: 1px solid #1a2332;
+            height: 100%;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.05) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
         }
         
-        .controls-panel {
-            background: #151b2e;
-            border: 1px solid #2a3f5f;
-            border-radius: 8px;
-            padding: 30px;
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
         }
         
-        .control-group {
-            margin-bottom: 28px;
+        /* Header */
+        header {
+            background: rgba(31, 31, 58, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--border);
         }
         
-        .control-label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 600;
-            font-size: 0.95em;
-            color: #c5d1e6;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .particle-control {
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
         }
         
-        .particle-control button {
-            width: 38px;
-            height: 38px;
-            border: 1px solid;
-            border-radius: 4px;
-            font-size: 1.3em;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-weight: 600;
-            background: transparent;
+        .logo {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            letter-spacing: -1px;
         }
         
-        .particle-control button:hover {
-            opacity: 0.8;
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2.5rem;
         }
         
-        .particle-control button:active {
-            transform: scale(0.95);
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
         }
         
-        .proton-btn { 
-            border-color: #c23b3b;
-            color: #ff6b6b;
-        }
-        .proton-btn:hover {
-            background: rgba(194, 59, 59, 0.15);
-        }
-        
-        .neutron-btn { 
-            border-color: #6c7a89;
-            color: #a4b0be;
-        }
-        .neutron-btn:hover {
-            background: rgba(108, 122, 137, 0.15);
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
         }
         
-        .electron-btn { 
-            border-color: #4a69bd;
-            color: #6c8cdb;
-        }
-        .electron-btn:hover {
-            background: rgba(74, 105, 189, 0.15);
+        nav a:hover {
+            color: var(--accent);
         }
         
-        .particle-control .count {
-            flex: 1;
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
             text-align: center;
-            font-size: 1.1em;
-            background: #0a0e27;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #2a3f5f;
-            min-width: 70px;
-            font-weight: 600;
-            color: #ffffff;
         }
         
-        .legend {
-            background: #0a0e27;
-            border: 1px solid #2a3f5f;
-            border-radius: 4px;
-            padding: 18px;
-            margin-top: 25px;
+        .hero h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out;
         }
         
-        .legend-title {
-            font-size: 0.9em;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #c5d1e6;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-            font-size: 0.85em;
-            color: #8a9bb3;
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
         
-        .legend-item:last-child {
-            margin-bottom: 0;
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
         }
         
-        .legend-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            flex-shrink: 0;
+        section {
+            margin-bottom: 6rem;
         }
         
-        .indicator-positive { background: #c23b3b; }
-        .indicator-neutral { background: #27ae60; }
-        .indicator-negative { background: #4a69bd; }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-        
-        .info-panel {
-            background: #151b2e;
-            border: 1px solid #2a3f5f;
-            border-radius: 8px;
-            padding: 30px;
-        }
-        
-        .info-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 18px;
-        }
-        
-        .info-item {
-            background: #0a0e27;
-            padding: 16px;
-            border-radius: 4px;
-            border: 1px solid #2a3f5f;
-        }
-        
-        .info-item-label {
-            font-size: 0.75em;
-            color: #6c7a89;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-        
-        .info-item-value {
-            font-size: 1.3em;
-            font-weight: 600;
-            color: #ffffff;
-        }
-        
-        .info-full {
-            background: #0a0e27;
-            padding: 16px;
-            border-radius: 4px;
-            border: 1px solid #2a3f5f;
-            margin-bottom: 18px;
-        }
-        
-        .charge-badge {
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            position: relative;
             display: inline-block;
-            padding: 6px 16px;
-            border-radius: 3px;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-soft);
+        }
+        
+        h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.8rem;
+            margin: 2.5rem 0 1rem;
+            color: var(--accent-soft);
+        }
+        
+        h4 {
+            font-size: 1.3rem;
+            margin: 1.5rem 0 0.8rem;
+            color: var(--text);
             font-weight: 600;
-            font-size: 0.95em;
-            margin-top: 4px;
         }
         
-        .badge-positive { 
-            background: rgba(194, 59, 59, 0.2);
-            color: #ff6b6b;
-            border: 1px solid #c23b3b;
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-dim);
         }
         
-        .badge-neutral { 
-            background: rgba(39, 174, 96, 0.2);
-            color: #2ecc71;
-            border: 1px solid #27ae60;
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
         }
         
-        .badge-negative { 
-            background: rgba(74, 105, 189, 0.2);
-            color: #6c8cdb;
-            border: 1px solid #4a69bd;
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         
-        .applications {
-            background: #0a0e27;
-            padding: 18px;
-            border-radius: 4px;
-            border: 1px solid #2a3f5f;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.2);
         }
         
-        .applications-title {
-            font-size: 0.85em;
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card h4 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        /* Info Boxes */
+        .info-box {
+            background: rgba(233, 69, 96, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .info-box.warning {
+            background: rgba(243, 156, 107, 0.1);
+            border-left-color: var(--accent-soft);
+        }
+        
+        .info-box h4 {
+            color: var(--accent);
+            margin-top: 0;
+        }
+        
+        /* Tables */
+        .hormone-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .hormone-table th {
+            background: var(--secondary);
+            color: var(--accent);
+            padding: 1.2rem;
+            text-align: left;
             font-weight: 600;
-            color: #c5d1e6;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         
-        .applications-text {
-            font-size: 0.9em;
-            line-height: 1.6;
-            color: #8a9bb3;
+        .hormone-table td {
+            padding: 1.2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
         }
         
-        .particle-legend {
-            display: flex;
-            gap: 20px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #2a3f5f;
+        .hormone-table tr:hover {
+            background: rgba(233, 69, 96, 0.05);
         }
         
-        .particle-legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85em;
-            color: #8a9bb3;
+        /* Brain Regions */
+        .brain-regions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
         
-        .particle-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
+        .region {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-soft);
         }
         
-        .dot-proton { background: #ff6b6b; }
-        .dot-neutron { background: #a4b0be; }
-        .dot-electron { background: #6c8cdb; }
+        .region h5 {
+            color: var(--accent-soft);
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        /* Interactive Elements */
+        .interaction-example {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--card-bg) 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+        }
+        
+        ul, ol {
+            margin: 1.5rem 0 1.5rem 2rem;
+            color: var(--text-dim);
+        }
+        
+        li {
+            margin-bottom: 0.8rem;
+        }
+        
+        strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 2px solid var(--border);
+            margin-top: 6rem;
+        }
+        
+        footer p {
+            color: var(--text-dim);
+            margin: 0.5rem 0;
+        }
+        
+        .disclaimer {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(233, 69, 96, 0.1);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Highlight effect */
+        .highlight {
+            color: var(--accent-soft);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Atomic Structure Visualizer</h1>
-        <p>Interactive 3D model for understanding atomic composition and isotopes</p>
+    <header>
+        <nav>
+            <a href="#" class="logo">NeuroHub</a>
+            <ul>
+                <li><a href="#hormones">Hormones</a></li>
+                <li><a href="#brain">Brain Regions</a></li>
+                <li><a href="#psychology">Psychology</a></li>
+                <li><a href="#influence">Social Influence</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>Understanding the Science of Human Behavior</h1>
+        <p>Explore the fascinating intersection of neuroscience, endocrinology, and psychology to understand how hormones, brain structures, and social dynamics shape our decisions, relationships, and interactions.</p>
     </div>
-    
+
     <div class="container">
-        <div class="main-grid">
-            <div class="canvas-section">
-                <h2 class="section-title">3D Atomic Model</h2>
-                <canvas id="atomCanvas"></canvas>
-                <div class="particle-legend">
-                    <div class="particle-legend-item">
-                        <div class="particle-dot dot-proton"></div>
-                        <span>Proton (+)</span>
-                    </div>
-                    <div class="particle-legend-item">
-                        <div class="particle-dot dot-neutron"></div>
-                        <span>Neutron (0)</span>
-                    </div>
-                    <div class="particle-legend-item">
-                        <div class="particle-dot dot-electron"></div>
-                        <span>Electron (−)</span>
-                    </div>
+        <!-- HORMONES SECTION -->
+        <section id="hormones">
+            <h2>Hormones & Neurotransmitters</h2>
+            <p>Hormones are chemical messengers that regulate virtually every aspect of human behavior, from mood and stress response to social bonding and decision-making. Understanding their mechanisms provides insight into why we feel and act the way we do.</p>
+
+            <h3>Major Hormones and Their Functions</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">🧠</div>
+                    <h4>Dopamine</h4>
+                    <p><strong>Function:</strong> Reward, motivation, pleasure, and learning</p>
+                    <p><strong>Production:</strong> Ventral tegmental area (VTA) and substantia nigra</p>
+                    <p><strong>Effects:</strong> Drives goal-directed behavior, creates feelings of satisfaction when goals are achieved, essential for learning through reinforcement. Imbalances linked to addiction, ADHD, and Parkinson's disease.</p>
+                    <p><strong>In Relationships:</strong> Surges during early romantic attraction, creating "reward" feelings when seeing or thinking about a romantic partner.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">💝</div>
+                    <h4>Oxytocin</h4>
+                    <p><strong>Function:</strong> Social bonding, trust, empathy</p>
+                    <p><strong>Production:</strong> Hypothalamus, released by pituitary gland</p>
+                    <p><strong>Effects:</strong> Promotes attachment between mothers and infants, strengthens romantic bonds, increases trust and reduces fear in social contexts. Released during physical touch, sex, and positive social interactions.</p>
+                    <p><strong>In Relationships:</strong> Creates feelings of closeness and attachment, facilitates emotional bonding, increases willingness to cooperate and trust others.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h4>Serotonin</h4>
+                    <p><strong>Function:</strong> Mood regulation, sleep, appetite, cognition</p>
+                    <p><strong>Production:</strong> Raphe nuclei in brainstem</p>
+                    <p><strong>Effects:</strong> Stabilizes mood, promotes feelings of wellbeing and happiness, regulates sleep-wake cycles. Low levels associated with depression, anxiety, and obsessive thinking. SSRIs (common antidepressants) work by increasing serotonin availability.</p>
+                    <p><strong>Social Impact:</strong> Higher serotonin correlates with increased social confidence and reduced social anxiety.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">⚠️</div>
+                    <h4>Cortisol</h4>
+                    <p><strong>Function:</strong> Stress response, metabolism, immune function</p>
+                    <p><strong>Production:</strong> Adrenal glands (HPA axis activation)</p>
+                    <p><strong>Effects:</strong> Mobilizes energy during stress, enhances memory of emotional events, suppresses non-essential functions. Chronic elevation impairs memory, weakens immune system, and contributes to anxiety and depression.</p>
+                    <p><strong>In Conflict:</strong> Elevated during arguments or social threats, can impair rational thinking and increase defensive reactions.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🔥</div>
+                    <h4>Testosterone</h4>
+                    <p><strong>Function:</strong> Dominance, confidence, competition, libido</p>
+                    <p><strong>Production:</strong> Testes (males), ovaries and adrenal glands (females)</p>
+                    <p><strong>Effects:</strong> Increases assertiveness, risk-taking, and competitive behavior. Affects both men and women, though levels are typically higher in males. Influences spatial reasoning, muscle mass, and sexual desire.</p>
+                    <p><strong>Social Dynamics:</strong> Rises in competitive situations and after victories; drops after defeats. Influences status-seeking behavior.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🌙</div>
+                    <h4>Melatonin</h4>
+                    <p><strong>Function:</strong> Sleep-wake regulation, circadian rhythm</p>
+                    <p><strong>Production:</strong> Pineal gland</p>
+                    <p><strong>Effects:</strong> Induces sleepiness, regulates body's internal clock. Production triggered by darkness, suppressed by light (especially blue light). Disruption contributes to insomnia, mood disorders, and cognitive impairment.</p>
+                    <p><strong>Behavioral Impact:</strong> Proper sleep cycles improve emotional regulation, decision-making, and social functioning.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">❤️</div>
+                    <h4>Endorphins</h4>
+                    <p><strong>Function:</strong> Pain relief, pleasure, stress reduction</p>
+                    <p><strong>Production:</strong> Pituitary gland and nervous system</p>
+                    <p><strong>Effects:</strong> Natural painkillers, create "runner's high," released during exercise, laughter, and eating. Promote feelings of euphoria and wellbeing. Evolutionary role in pushing through pain and bonding through shared experiences.</p>
+                    <p><strong>Social Bonding:</strong> Released during group activities, laughter, and music, strengthening social connections.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">⚖️</div>
+                    <h4>Estrogen</h4>
+                    <p><strong>Function:</strong> Emotional processing, neuroprotection, reproduction</p>
+                    <p><strong>Production:</strong> Ovaries, adrenal glands, fat tissues</p>
+                    <p><strong>Effects:</strong> Enhances verbal memory and emotional recognition, provides neuroprotection, influences mood and anxiety levels. Fluctuations throughout menstrual cycle affect emotional reactivity and cognitive function.</p>
+                    <p><strong>Communication:</strong> Higher levels correlate with enhanced verbal fluency and emotional expressiveness.</p>
                 </div>
             </div>
+
+            <h3>Hormone Interactions in Social Contexts</h3>
             
-            <div class="controls-panel">
-                <h2 class="section-title">Particle Configuration</h2>
-                
-                <div class="control-group">
-                    <label class="control-label">Protons</label>
-                    <div class="particle-control">
-                        <button class="proton-btn" onclick="changeParticle('protons', -1)">−</button>
-                        <span class="count" id="protonCount">1</span>
-                        <button class="proton-btn" onclick="changeParticle('protons', 1)">+</button>
-                    </div>
+            <table class="hormone-table">
+                <thead>
+                    <tr>
+                        <th>Situation</th>
+                        <th>Hormones Involved</th>
+                        <th>Behavioral Effect</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early romantic attraction</td>
+                        <td>Dopamine ↑, Norepinephrine ↑, Serotonin ↓</td>
+                        <td>Euphoria, obsessive thinking, increased energy, reduced appetite</td>
+                    </tr>
+                    <tr>
+                        <td>Long-term bonding</td>
+                        <td>Oxytocin ↑, Vasopressin ↑</td>
+                        <td>Attachment, trust, commitment, desire for closeness</td>
+                    </tr>
+                    <tr>
+                        <td>Social rejection</td>
+                        <td>Cortisol ↑, Dopamine ↓, Endorphins ↓</td>
+                        <td>Stress, pain (social pain activates same regions as physical pain), lowered mood</td>
+                    </tr>
+                    <tr>
+                        <td>Winning/Success</td>
+                        <td>Testosterone ↑, Dopamine ↑, Cortisol ↓</td>
+                        <td>Increased confidence, motivation for further competition, reduced stress</td>
+                    </tr>
+                    <tr>
+                        <td>Public speaking</td>
+                        <td>Cortisol ↑, Adrenaline ↑</td>
+                        <td>Anxiety, heightened alertness, potential memory impairment under extreme stress</td>
+                    </tr>
+                    <tr>
+                        <td>Physical touch (hugging)</td>
+                        <td>Oxytocin ↑, Cortisol ↓, Endorphins ↑</td>
+                        <td>Reduced stress, increased trust, pain relief, feelings of safety</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <h4>🔬 Research Insight: The Chemistry of Love</h4>
+                <p>Neuroscientist Helen Fisher's research using fMRI scans showed that romantic love activates the brain's reward system similarly to cocaine. Early-stage romantic love shows high dopamine and norepinephrine (creating euphoria and obsession) with decreased serotonin (leading to intrusive thoughts about the partner). After 12-24 months, these neurochemical patterns shift toward oxytocin and vasopressin dominance, facilitating long-term attachment rather than passionate obsession.</p>
+            </div>
+        </section>
+
+        <!-- BRAIN REGIONS SECTION -->
+        <section id="brain">
+            <h2>Brain Regions & Behavioral Functions</h2>
+            <p>The human brain is a complex network where specific regions specialize in particular functions. Understanding these areas helps explain why we react, feel, and decide in specific ways during social interactions.</p>
+
+            <h3>Key Brain Structures in Social Behavior</h3>
+
+            <div class="brain-regions">
+                <div class="region">
+                    <h5>Prefrontal Cortex (PFC)</h5>
+                    <p><strong>Location:</strong> Frontal lobe, behind forehead</p>
+                    <p><strong>Primary Functions:</strong></p>
+                    <ul>
+                        <li>Executive control and decision-making</li>
+                        <li>Impulse regulation and delayed gratification</li>
+                        <li>Social behavior and personality expression</li>
+                        <li>Working memory and attention</li>
+                    </ul>
+                    <p><strong>Social Role:</strong> The PFC is critical for regulating emotional responses, especially in social contexts. It inhibits inappropriate impulses and allows for consideration of long-term consequences. Damage or underdevelopment (as in adolescence) leads to poor impulse control and risky decision-making.</p>
+                    <p><strong>In Influence:</strong> When someone tries to persuade you, your PFC evaluates the argument's logic and your long-term interests. Emotional manipulation can bypass PFC scrutiny by triggering faster, emotional responses.</p>
                 </div>
-                
-                <div class="control-group">
-                    <label class="control-label">Neutrons</label>
-                    <div class="particle-control">
-                        <button class="neutron-btn" onclick="changeParticle('neutrons', -1)">−</button>
-                        <span class="count" id="neutronCount">0</span>
-                        <button class="neutron-btn" onclick="changeParticle('neutrons', 1)">+</button>
-                    </div>
+
+                <div class="region">
+                    <h5>Amygdala</h5>
+                    <p><strong>Location:</strong> Medial temporal lobe (deep in brain)</p>
+                    <p><strong>Primary Functions:</strong></p>
+                    <ul>
+                        <li>Emotional processing, especially fear and threat</li>
+                        <li>Emotional memory formation</li>
+                        <li>Social judgment and reading facial expressions</li>
+                    </ul>
+                    <p><strong>Social Role:</strong> The amygdala processes emotional significance of stimuli incredibly quickly (before conscious awareness). It's essential for detecting potential threats in social situations and remembering emotionally charged events. Hyperactivity linked to anxiety disorders.</p>
+                    <p><strong>In Manipulation:</strong> Fear-based appeals activate the amygdala, potentially overwhelming rational PFC analysis. This is why scare tactics in advertising or politics can be effective.</p>
                 </div>
-                
-                <div class="control-group">
-                    <label class="control-label">Electrons</label>
-                    <div class="particle-control">
-                        <button class="electron-btn" onclick="changeParticle('electrons', -1)">−</button>
-                        <span class="count" id="electronCount">1</span>
-                        <button class="electron-btn" onclick="changeParticle('electrons', 1)">+</button>
-                    </div>
+
+                <div class="region">
+                    <h5>Anterior Cingulate Cortex (ACC)</h5>
+                    <p><strong>Location:</strong> Frontal part of cingulate cortex</p>
+                    <p><strong>Primary Functions:</strong></p>
+                    <ul>
+                        <li>Error detection and conflict monitoring</li>
+                        <li>Empathy and emotional regulation</li>
+                        <li>Decision-making and motivation</li>
+                        <li>Social pain processing</li>
+                    </ul>
+                    <p><strong>Social Role:</strong> The ACC activates during social rejection and exclusion, processing "social pain" similarly to physical pain. It helps detect when our actions conflict with our goals and monitors social norm violations.</p>
+                    <p><strong>Notable:</strong> Studies show that acetaminophen (Tylenol) can reduce both physical and social pain, as both activate the ACC.</p>
                 </div>
-                
-                <div class="legend">
-                    <div class="legend-title">Atomic Charge States</div>
-                    <div class="legend-item">
-                        <div class="legend-indicator indicator-positive"></div>
-                        <span>Cation — Positive charge (p⁺ > e⁻)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-indicator indicator-neutral"></div>
-                        <span>Neutral — No net charge (p⁺ = e⁻)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-indicator indicator-negative"></div>
-                        <span>Anion — Negative charge (p⁺ < e⁻)</span>
-                    </div>
+
+                <div class="region">
+                    <h5>Hippocampus</h5>
+                    <p><strong>Location:</strong> Medial temporal lobe</p>
+                    <p><strong>Primary Functions:</strong></p>
+                    <ul>
+                        <li>Formation of new memories (episodic and spatial)</li>
+                        <li>Contextual learning</li>
+                        <li>Consolidation from short to long-term memory</li>
+                    </ul>
+                    <p><strong>Social Role:</strong> Critical for remembering past social interactions and learning from social experiences. Allows us to recall who is trustworthy based on past behavior. Chronic stress (high cortisol) can damage the hippocampus, impairing memory formation.</p>
+                    <p><strong>In Relationships:</strong> Emotional events are better remembered because the amygdala-hippocampus connection strengthens encoding of emotionally significant memories.</p>
+                </div>
+
+                <div class="region">
+                    <h5>Insula</h5>
+                    <p><strong>Location:</strong> Deep within lateral sulcus</p>
+                    <p><strong>Primary Functions:</strong></p>
+                    <ul>
+                        <li>Interoception (awareness of bodily states)</li>
+                        <li>Emotional awareness and empathy</li>
+                        <li>Disgust and aversion</li>
+                        <li>Self-awareness and subjective feelings</li>
+                    </ul>
+                    <p><strong>Social Role:</strong> The insula helps us understand our own emotions and those of others by simulating their emotional states. It's activated when we witness others in pain, contributing to empathy. Also processes moral disgust and social norm violations.</p>
+                </div>
+
+                <div class="region">
+                    <h5>Ventromedial Prefrontal Cortex (vmPFC)</h5>
+                    <p><strong>Location:</strong> Bottom-middle of prefrontal cortex</p>
+                    <p><strong>Primary Functions:</strong></p>
+                    <ul>
+                        <li>Emotional regulation and fear extinction</li>
+                        <li>Value-based decision making</li>
+                        <li>Self-referential thinking</li>
+                        <li>Moral reasoning</li>
+                    </ul>
+                    <p><strong>Social Role:</strong> Essential for integrating emotional information into decisions. Damage results in poor social decisions despite intact logical reasoning (famous case: Phineas Gage). Helps assign emotional value to outcomes and people.</p>
+                </div>
+
+                <div class="region">
+                    <h5>Nucleus Accumbens</h5>
+                    <p><strong>Location:</strong> Basal forebrain</p>
+                    <p><strong>Primary Functions:</strong></p>
+                    <ul>
+                        <li>Reward processing and pleasure</li>
+                        <li>Motivation and reinforcement learning</li>
+                        <li>Addiction vulnerability</li>
+                    </ul>
+                    <p><strong>Social Role:</strong> Part of the brain's reward circuit, strongly activated by social rewards like praise, acceptance, and romantic interest. Dopamine release here creates motivation to pursue rewarding social interactions.</p>
+                    <p><strong>In Influence:</strong> Marketing and persuasion often target this system by associating products with social rewards (status, belonging, attraction).</p>
+                </div>
+
+                <div class="region">
+                    <h5>Mirror Neuron System</h5>
+                    <p><strong>Location:</strong> Premotor cortex, inferior parietal lobule</p>
+                    <p><strong>Primary Functions:</strong></p>
+                    <ul>
+                        <li>Action understanding and imitation</li>
+                        <li>Empathy and social cognition</li>
+                        <li>Language comprehension</li>
+                    </ul>
+                    <p><strong>Social Role:</strong> Mirror neurons fire both when we perform an action and when we observe someone else performing it. This system underlies our ability to understand others' intentions, feel empathy, and learn through observation. Crucial for social learning and bonding.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="info-grid">
-            <div class="info-panel">
-                <h2 class="section-title">Atomic Properties</h2>
-                
-                <div class="info-row">
-                    <div class="info-item">
-                        <div class="info-item-label">Element</div>
-                        <div class="info-item-value" id="elementName">Hydrogen</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-item-label">Symbol</div>
-                        <div class="info-item-value" id="elementSymbol">H</div>
-                    </div>
-                </div>
-                
-                <div class="info-row">
-                    <div class="info-item">
-                        <div class="info-item-label">Atomic Number (Z)</div>
-                        <div class="info-item-value" id="atomicNumber">1</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-item-label">Mass Number (A)</div>
-                        <div class="info-item-value" id="massNumber">1</div>
-                    </div>
-                </div>
-                
-                <div class="info-full">
-                    <div class="info-item-label">Isotope Notation</div>
-                    <div class="info-item-value" id="isotope">¹H</div>
-                </div>
-                
-                <div class="info-full">
-                    <div class="info-item-label">Atomic Charge</div>
-                    <span id="charge" class="charge-badge badge-neutral">0 (Neutral Atom)</span>
-                </div>
-                
-                <div class="info-full">
-                    <div class="info-item-label">Isotope Identification</div>
-                    <div class="info-item-value" style="font-size: 1.1em;" id="isotopeInfo">Protium</div>
-                </div>
+
+            <div class="info-box warning">
+                <h4>⚠️ Brain Plasticity & Social Experience</h4>
+                <p>The brain remains plastic throughout life—experiences literally change neural structure. Chronic social stress can shrink the hippocampus and expand the amygdala, making someone more anxious and less able to form new memories. Conversely, positive social connections, meditation, and new learning can strengthen prefrontal regions and improve emotional regulation. Your social environment shapes your brain, which in turn shapes your behavior.</p>
             </div>
+
+            <h3>Neural Activation During Specific Interactions</h3>
+
+            <div class="interaction-example">
+                <h4>Scenario: Receiving Criticism from a Superior</h4>
+                <p><strong>Neural Response:</strong></p>
+                <ol>
+                    <li><strong>Amygdala</strong> rapidly detects threat/social danger → triggers stress response</li>
+                    <li><strong>HPA axis</strong> activates → cortisol and adrenaline released</li>
+                    <li><strong>ACC</strong> processes social pain and conflict between self-image and feedback</li>
+                    <li><strong>PFC</strong> attempts to regulate emotional response and evaluate feedback rationally</li>
+                    <li><strong>Insula</strong> creates visceral emotional awareness (that "sinking feeling")</li>
+                </ol>
+                <p><strong>Individual Variation:</strong> People with stronger PFC-amygdala connections can better regulate their emotional response and process criticism constructively. Those with weaker connections may experience overwhelming emotional reactions.</p>
+            </div>
+
+            <div class="interaction-example">
+                <h4>Scenario: Falling in Love</h4>
+                <p><strong>Neural Response:</strong></p>
+                <ol>
+                    <li><strong>VTA (dopamine neurons)</strong> activates intensely → creates reward and motivation</li>
+                    <li><strong>Nucleus accumbens</strong> processes reward → pleasure and desire for more contact</li>
+                    <li><strong>Caudate nucleus</strong> involved in goal-directed behavior → motivation to pursue partner</li>
+                    <li><strong>PFC regions</strong> show decreased activity → reduced critical judgment ("love is blind")</li>
+                    <li><strong>Oxytocin</strong> system activates during physical intimacy → bonding and trust</li>
+                </ol>
+                <p><strong>Interesting Finding:</strong> Brain scans of people in love show patterns similar to obsessive-compulsive disorder, explaining the intrusive thoughts about the beloved.</p>
+            </div>
+        </section>
+
+        <!-- PSYCHOLOGY SECTION -->
+        <section id="psychology">
+            <h2>Psychology of Human Relationships</h2>
+            <p>Human relationships are governed by predictable psychological patterns shaped by evolution, learning, and social context. Understanding these principles reveals why people behave as they do in social situations.</p>
+
+            <h3>Fundamental Psychological Principles</h3>
+
+            <h4>1. Attachment Theory</h4>
+            <p>Developed by John Bowlby and Mary Ainsworth, attachment theory describes how early relationships with caregivers shape relationship patterns throughout life.</p>
             
-            <div class="info-panel">
-                <h2 class="section-title">Applications & Properties</h2>
-                <div class="applications" id="applications">
-                    <div class="applications-title">Primary Applications</div>
-                    <div class="applications-text">
-                        Protium (¹H) is the most abundant hydrogen isotope, comprising 99.98% of natural hydrogen. Used extensively in organic chemistry, petroleum refining, ammonia production for fertilizers, and as a clean fuel source in fuel cells.
-                    </div>
+            <div class="cards-grid">
+                <div class="card">
+                    <h4>Secure Attachment (60%)</h4>
+                    <p><strong>Origin:</strong> Consistent, responsive caregiving</p>
+                    <p><strong>Adult Pattern:</strong> Comfortable with intimacy and independence, trusting, effective communication, healthy boundaries</p>
+                    <p><strong>In Relationships:</strong> Can give and receive support, handles conflict constructively, maintains stable relationships</p>
+                </div>
+
+                <div class="card">
+                    <h4>Anxious-Preoccupied (20%)</h4>
+                    <p><strong>Origin:</strong> Inconsistent caregiving</p>
+                    <p><strong>Adult Pattern:</strong> Seeks extreme closeness, fears abandonment, needs constant reassurance, sensitive to rejection</p>
+                    <p><strong>In Relationships:</strong> May appear "clingy," overanalyzes partner's behavior, emotional volatility, difficulty trusting</p>
+                </div>
+
+                <div class="card">
+                    <h4>Dismissive-Avoidant (15%)</h4>
+                    <p><strong>Origin:</strong> Emotionally unavailable or rejecting caregivers</p>
+                    <p><strong>Adult Pattern:</strong> Values independence highly, uncomfortable with emotional intimacy, self-reliant to a fault</p>
+                    <p><strong>In Relationships:</strong> Emotionally distant, may withdraw during conflict, difficulty expressing feelings or needs</p>
+                </div>
+
+                <div class="card">
+                    <h4>Fearful-Avoidant (5%)</h4>
+                    <p><strong>Origin:</strong> Trauma, abuse, or severely inconsistent care</p>
+                    <p><strong>Adult Pattern:</strong> Desires closeness but fears it, conflicted, unpredictable</p>
+                    <p><strong>In Relationships:</strong> Push-pull dynamic, trust issues, may sabotage relationships, high emotional reactivity</p>
                 </div>
             </div>
+
+            <p><strong>Neural Basis:</strong> Attachment patterns are encoded in neural pathways through repeated early experiences. The amygdala's reactivity to perceived abandonment and the PFC's ability to regulate these responses differ based on attachment style. Secure attachment correlates with better PFC-amygdala connectivity.</p>
+
+            <h4>2. Reciprocity and Social Exchange</h4>
+            <p>Humans have a powerful psychological drive for reciprocity—we feel obligated to return favors and repay kindnesses. This principle governs much of social interaction.</p>
+
+            <p><strong>Key Concepts:</strong></p>
+            <ul>
+                <li><strong>Reciprocal Altruism:</strong> We help others with the unconscious expectation of future help in return. This evolved as a survival mechanism.</li>
+                <li><strong>Social Exchange Theory:</strong> Relationships persist when perceived rewards exceed costs. People constantly (often unconsciously) calculate the value they give and receive.</li>
+                <li><strong>Equity Theory:</strong> People are satisfied when they perceive fairness in relationships. Imbalance creates discomfort and motivation to restore equity.</li>
+            </ul>
+
+            <p><strong>Neural Mechanism:</strong> The nucleus accumbens (reward center) activates when we receive help or gifts. Interestingly, it also activates when we help others, creating the "warm glow" of giving. The insula detects unfairness and generates feelings of disgust at inequity.</p>
+
+            <div class="info-box">
+                <h4>💡 Application: The Door-in-the-Face Technique</h4>
+                <p>This persuasion technique exploits reciprocity. First, make a large request that will be refused. Then make a smaller request (your actual goal). Because the requester "conceded" by reducing their demand, the target feels obligated to reciprocate by conceding and accepting the smaller request. Studies show this can double compliance rates compared to making only the small request.</p>
+            </div>
+
+            <h4>3. Social Proof and Conformity</h4>
+            <p>Humans are highly influenced by what others do, think, and believe. This tendency has deep evolutionary roots—following the group usually led to better survival outcomes.</p>
+
+            <p><strong>Mechanisms:</strong></p>
+            <ul>
+                <li><strong>Informational Influence:</strong> We look to others to understand ambiguous situations ("If everyone's doing it, it must be right")</li>
+                <li><strong>Normative Influence:</strong> We conform to be accepted and avoid rejection, even when we privately disagree</li>
+                <li><strong>Identification:</strong> We adopt behaviors of groups we identify with or aspire to join</li>
+            </ul>
+
+            <p><strong>Classic Studies:</strong></p>
+            <ul>
+                <li><strong>Asch Conformity (1951):</strong> 75% of participants gave obviously wrong answers to conform with a group, despite clear evidence otherwise</li>
+                <li><strong>Milgram Obedience (1961):</strong> 65% delivered what they believed were dangerous electric shocks when instructed by an authority figure</li>
+            </ul>
+
+            <p><strong>Neural Basis:</strong> Brain imaging shows that when our opinions differ from the group, the amygdala activates (social threat), while the nucleus accumbens activates when we align with the group (social reward). The PFC works to integrate personal judgment with social pressures.</p>
+
+            <h4>4. Cognitive Biases in Relationships</h4>
+
+            <table class="hormone-table">
+                <thead>
+                    <tr>
+                        <th>Bias</th>
+                        <th>Description</th>
+                        <th>Social Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Confirmation Bias</td>
+                        <td>Seeking information that confirms existing beliefs</td>
+                        <td>We notice evidence supporting our view of someone and ignore contradictory information. Creates self-fulfilling prophecies in relationships.</td>
+                    </tr>
+                    <tr>
+                        <td>Fundamental Attribution Error</td>
+                        <td>Attributing others' behavior to personality rather than situation</td>
+                        <td>"They're late because they're irresponsible" vs. "I'm late because traffic was terrible." Leads to unfair judgments and conflict.</td>
+                    </tr>
+                    <tr>
+                        <td>Halo Effect</td>
+                        <td>One positive trait influences overall perception</td>
+                        <td>Physically attractive people are assumed to be more competent, kind, and intelligent. First impressions color all subsequent interactions.</td>
+                    </tr>
+                    <tr>
+                        <td>Negativity Bias</td>
+                        <td>Negative information weighs more heavily than positive</td>
+                        <td>One criticism has more impact than five compliments. Evolved as protection from threats, but damages relationships when overactive.</td>
+                    </tr>
+                    <tr>
+                        <td>Availability Heuristic</td>
+                        <td>Judging likelihood by what easily comes to mind</td>
+                        <td>Recent arguments feel more significant than cumulative positive history. Media exposure affects perception of relationship "norms."</td>
+                    </tr>
+                    <tr>
+                        <td>Self-Serving Bias</td>
+                        <td>Taking credit for success, blaming circumstances for failure</td>
+                        <td>Protects self-esteem but creates resentment when both partners claim credit and assign blame. Prevents learning from mistakes.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>5. Emotional Contagion and Empathy</h4>
+            <p>Emotions spread between people through unconscious mimicry and mirror neuron activation. This serves important social functions but can also be exploited.</p>
+
+            <p><strong>Mechanisms:</strong></p>
+            <ul>
+                <li><strong>Automatic Mimicry:</strong> We unconsciously mirror others' facial expressions, posture, and vocal tone within milliseconds</li>
+                <li><strong>Afferent Feedback:</strong> Our own mirrored expressions send signals to our brain, creating the corresponding emotion (facial feedback hypothesis)</li>
+                <li><strong>Shared Neural Representation:</strong> Mirror neurons create a simulation of others' emotional states in our own neural systems</li>
+            </ul>
+
+            <p><strong>Types of Empathy:</strong></p>
+            <ul>
+                <li><strong>Affective Empathy:</strong> Feeling what others feel (involves insula and anterior cingulate)</li>
+                <li><strong>Cognitive Empathy:</strong> Understanding others' perspectives intellectually (involves medial prefrontal cortex)</li>
+                <li><strong>Compassionate Empathy:</strong> Understanding + feeling + motivated to help (involves empathy networks plus reward circuitry)</li>
+            </ul>
+
+            <div class="info-box warning">
+                <h4>⚠️ Empathy Manipulation</h4>
+                <p>Emotional contagion can be intentionally triggered to influence others. For example, displaying vulnerability or distress can activate others' empathic responses and compliance. Sales tactics often use stories of hardship to create emotional connection. While empathy is prosocial, awareness of these mechanisms helps identify when emotional appeals may be manipulative rather than genuine.</p>
+            </div>
+
+            <h4>6. The Power of Consistency and Commitment</h4>
+            <p>Once people commit to something (especially publicly), they feel psychological pressure to behave consistently with that commitment, even if circumstances change.</p>
+
+            <p><strong>Why This Works:</strong></p>
+            <ul>
+                <li><strong>Cognitive Dissonance:</strong> Inconsistency between beliefs/actions creates psychological discomfort, motivating alignment</li>
+                <li><strong>Self-Perception:</strong> We infer our attitudes from our behavior ("I did X, therefore I must believe Y")</li>
+                <li><strong>Social Pressure:</strong> Public commitments invoke accountability; backing out threatens social reputation</li>
+            </ul>
+
+            <p><strong>Foot-in-the-Door Technique:</strong> Getting small commitments first makes people more likely to agree to larger requests later. Starting with "Can you answer one quick question?" often leads to completing a full survey.</p>
+
+            <p><strong>Neural Basis:</strong> The anterior cingulate cortex detects inconsistency between self-concept and behavior, creating discomfort. The brain resolves this by adjusting either behavior or beliefs to restore consistency.</p>
+        </section>
+
+        <!-- INFLUENCE SECTION -->
+        <section id="influence">
+            <h2>Social Influence & Persuasion</h2>
+            <p>Understanding influence mechanisms is valuable for recognizing when others attempt to persuade you and for communicating more effectively. While these principles can be used ethically, awareness also protects against manipulation.</p>
+
+            <h3>Core Principles of Influence</h3>
+
+            <h4>1. Authority and Obedience</h4>
+            <p>People show strong deference to perceived authority figures, often complying with requests without critical evaluation.</p>
+
+            <p><strong>Authority Indicators:</strong></p>
+            <ul>
+                <li><strong>Titles:</strong> "Dr.," "Professor," "CEO" increase compliance</li>
+                <li><strong>Clothing:</strong> Uniforms, business attire signal authority</li>
+                <li><strong>Symbols:</strong> Expensive cars, offices, accessories convey status</li>
+                <li><strong>Knowledge:</strong> Demonstrated expertise in relevant domain</li>
+            </ul>
+
+            <p><strong>Neural Response:</strong> Authority triggers reduced activation in brain regions associated with critical thinking and increased activation in areas related to compliance and rule-following. This is an evolved response to social hierarchy.</p>
+
+            <div class="info-box">
+                <h4>🛡️ Defense Against Authority Manipulation</h4>
+                <p>Ask yourself: (1) Is this person truly an expert in the relevant field? (2) How trustworthy is this expert? (Experts can be biased or bought) (3) What does the consensus of experts say? One contrarian "expert" is often less reliable than mainstream consensus.</p>
+            </div>
+
+            <h4>2. Scarcity and Loss Aversion</h4>
+            <p>Things become more desirable when perceived as scarce or at risk of being lost. This principle drives urgency in decision-making.</p>
+
+            <p><strong>Psychological Mechanism:</strong></p>
+            <ul>
+                <li><strong>Loss Aversion:</strong> Losses feel roughly twice as bad as equivalent gains feel good (Kahneman & Tversky)</li>
+                <li><strong>Reactance:</strong> When freedom is threatened, desire for that option increases</li>
+                <li><strong>Value Inference:</strong> "If it's scarce, it must be valuable"</li>
+            </ul>
+
+            <p><strong>Common Applications:</strong></p>
+            <ul>
+                <li>"Limited time offer" / "Only 3 left in stock"</li>
+                <li>"Exclusive access" / "Members only"</li>
+                <li>Deadlines and countdown timers</li>
+                <li>"Other people are interested" (scarcity of opportunity)</li>
+            </ul>
+
+            <p><strong>Neural Basis:</strong> Scarcity activates the amygdala (threat/urgency) and reduces PFC activity (rational evaluation). The brain's threat-detection system prioritizes securing resources before they're gone.</p>
+
+            <h4>3. Liking and Similarity</h4>
+            <p>We're more easily influenced by people we like, and we like people who are similar to us, attractive, familiar, and who like us back.</p>
+
+            <p><strong>Factors That Increase Liking:</strong></p>
+            <ul>
+                <li><strong>Physical Attractiveness:</strong> Halo effect extends to perceived trustworthiness and competence</li>
+                <li><strong>Similarity:</strong> Shared background, opinions, interests, even superficial traits (name, birthday)</li>
+                <li><strong>Compliments:</strong> Praise activates reward centers, even when obviously insincere</li>
+                <li><strong>Cooperation:</strong> Working toward common goals builds rapport</li>
+                <li><strong>Familiarity:</strong> Mere exposure effect—repeated exposure increases liking</li>
+                <li><strong>Association:</strong> We like people associated with positive experiences (classical conditioning)</li>
+            </ul>
+
+            <p><strong>Mirroring and Rapport:</strong> Subtly matching someone's body language, speech patterns, and energy level increases liking and trust. This happens naturally in positive interactions but can be intentionally employed.</p>
+
+            <h4>4. Framing and Perspective</h4>
+            <p>How information is presented dramatically affects decisions, even when the underlying facts are identical.</p>
+
+            <p><strong>Classic Examples:</strong></p>
+            <ul>
+                <li><strong>Gain vs. Loss Framing:</strong> "90% survival rate" is more appealing than "10% mortality rate" (same information)</li>
+                <li><strong>Anchoring:</strong> First number mentioned influences subsequent judgments (asking "Is the population of Chicago more or less than 10 million?" leads to lower estimates than starting with "Is it more or less than 1 million?")</li>
+                <li><strong>Decoy Effect:</strong> Introducing a clearly inferior option makes a target option more attractive</li>
+                <li><strong>Default Effect:</strong> Options presented as defaults are chosen more often, even when alternatives are available</li>
+            </ul>
+
+            <p><strong>In Negotiation:</strong> Whoever makes the first offer sets the anchor. Research shows final agreements correlate more strongly with first offers than with actual value.</p>
+
+            <h4>5. Emotional Triggers</h4>
+            <p>Emotions often override logical analysis, making emotional appeals powerful influence tools.</p>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h4>Fear</h4>
+                    <p><strong>Mechanism:</strong> Amygdala activation → reduced PFC activity → impaired rational evaluation</p>
+                    <p><strong>Application:</strong> "Without this insurance, you could lose everything"</p>
+                    <p><strong>Effectiveness:</strong> Most effective when paired with clear solution/escape route</p>
+                </div>
+
+                <div class="card">
+                    <h4>Guilt</h4>
+                    <p><strong>Mechanism:</strong> Activates anterior cingulate (monitors social norms) → discomfort → motivation to alleviate</p>
+                    <p><strong>Application:</strong> "Others have donated; these children are counting on people like you"</p>
+                    <p><strong>Effectiveness:</strong> Powerful motivator but can backfire if perceived as manipulation</p>
+                </div>
+
+                <div class="card">
+                    <h4>Belonging</h4>
+                    <p><strong>Mechanism:</strong> Nucleus accumbens reward activation → oxytocin release → bonding motivation</p>
+                    <p><strong>Application:</strong> "Join our community" / "People like you choose..."</p>
+                    <p><strong>Effectiveness:</strong> Extremely powerful; exploits fundamental human need for social connection</p>
+                </div>
+
+                <div class="card">
+                    <h4>Greed/Desire</h4>
+                    <p><strong>Mechanism:</strong> Dopamine surge → impaired delayed gratification → impulsive action</p>
+                    <p><strong>Application:</strong> "Get rich quick" / "Exclusive opportunity"</p>
+                    <p><strong>Effectiveness:</strong> Hijacks reward system, reduces critical thinking</p>
+                </div>
+            </div>
+
+            <h3>Advanced Influence Techniques</h3>
+
+            <h4>Priming and Unconscious Influence</h4>
+            <p>Subtle environmental cues influence behavior without conscious awareness.</p>
+
+            <p><strong>Research Examples:</strong></p>
+            <ul>
+                <li>People walk more slowly after being exposed to words associated with elderly (Bargh et al.)</li>
+                <li>Participants act more cooperatively when sitting at a table with a briefcase versus a backpack (business prime)</li>
+                <li>Judges give harsher sentences before lunch than after (decision fatigue)</li>
+                <li>Red color in contexts increases perceived dominance and aggression</li>
+            </ul>
+
+            <p><strong>Application in Persuasion:</strong> Setting, word choice, imagery, and even scents can prime desired responses without the target's awareness.</p>
+
+            <h4>The Contrast Principle</h4>
+            <p>Perception of things depends on what they're compared to. Presenting items in strategic sequence alters their perceived value.</p>
+
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li>Showing an expensive item first makes the next item seem more affordable</li>
+                <li>A moderate request seems reasonable after an extreme one (door-in-the-face)</li>
+                <li>"Good-better-best" pricing makes the middle option most appealing</li>
+            </ul>
+
+            <h4>Social Validation Techniques</h4>
+            <p>Leveraging others' behavior to influence decisions:</p>
+
+            <ul>
+                <li><strong>Testimonials:</strong> "Real people" endorsements activate social proof</li>
+                <li><strong>Popularity Metrics:</strong> "1 million users" / "Best-seller" signals quality</li>
+                <li><strong>Similarity Focus:</strong> "People like you chose..." (targets in-group influence)</li>
+                <li><strong>Expert Consensus:</strong> "9 out of 10 dentists recommend"</li>
+                <li><strong>FOMO:</strong> "Don't be left out" combines social proof with scarcity</li>
+            </ul>
+
+            <h3>Ethical Considerations</h3>
+
+            <div class="info-box warning">
+                <h4>⚖️ Using Influence Responsibly</h4>
+                <p>These principles are powerful and ethically neutral—they can be used to help or harm. <strong>Ethical persuasion:</strong> serves the other person's genuine interests, provides accurate information, respects autonomy, and allows informed choice. <strong>Manipulation:</strong> prioritizes the persuader's interests over the target's, uses deception or emotional exploitation, restricts information, and undermines autonomous decision-making.</p>
+                
+                <p><strong>Self-Awareness:</strong> Understanding these mechanisms helps you recognize when you're being influenced and evaluate whether it's in your interest. Ask: "Am I making this decision based on logic and my values, or am I responding to emotional triggers and social pressure?"</p>
+
+                <p><strong>Relationships:</strong> Chronic manipulation damages trust and relationships. Short-term compliance gained through manipulation often backfires, creating resentment and resistance. Genuine influence through honesty, respect, and mutual benefit creates sustainable, positive relationships.</p>
+            </div>
+
+            <h3>Protecting Yourself from Manipulation</h3>
+
+            <p><strong>Critical Questions to Ask:</strong></p>
+            <ol>
+                <li><strong>What's the evidence?</strong> Move beyond emotional appeals to facts</li>
+                <li><strong>What are the alternatives?</strong> Scarcity tactics hide other options</li>
+                <li><strong>Who benefits?</strong> Analyze whose interests are served</li>
+                <li><strong>Am I being rushed?</strong> Urgency prevents careful consideration</li>
+                <li><strong>Is this reciprocal?</strong> True relationships balance give and take</li>
+                <li><strong>What would I think tomorrow?</strong> Perspective-taking reduces impulsive decisions</li>
+                <li><strong>Would I advise a friend to do this?</strong> Removes personal emotional involvement</li>
+            </ol>
+
+            <p><strong>Building Resistance:</strong></p>
+            <ul>
+                <li><strong>Strengthen PFC function:</strong> Sleep, stress management, and mindfulness improve executive control</li>
+                <li><strong>Delay decisions:</strong> "I need to think about it" allows rational processing</li>
+                <li><strong>Seek diverse perspectives:</strong> Counters confirmation bias and groupthink</li>
+                <li><strong>Identify your vulnerabilities:</strong> We're all susceptible to specific triggers (status, belonging, fear, etc.)</li>
+                <li><strong>Practice saying no:</strong> Builds psychological muscle for resisting unwanted influence</li>
+            </ul>
+        </section>
+
+        <!-- INTEGRATION SECTION -->
+        <section id="integration">
+            <h2>Integration: Putting It All Together</h2>
+            <p>Understanding human behavior requires integrating insights from neuroscience, endocrinology, and psychology. Here's how these systems work together in real scenarios.</p>
+
+            <h3>Case Study: Job Interview</h3>
+
+            <div class="interaction-example">
+                <h4>Neurobiological Process:</h4>
+                <ol>
+                    <li><strong>Pre-Interview (Anticipation):</strong>
+                        <ul>
+                            <li>HPA axis activation → cortisol rises (stress response)</li>
+                            <li>Amygdala activation increases (threat detection)</li>
+                            <li>Working memory capacity may decrease (PFC impairment from stress)</li>
+                            <li>Heart rate and blood pressure increase (sympathetic nervous system)</li>
+                        </ul>
+                    </li>
+                    <li><strong>During Interview (Social Evaluation):</strong>
+                        <ul>
+                            <li>PFC works overtime for impression management and response formulation</li>
+                            <li>Mirror neurons activate to read interviewer's reactions</li>
+                            <li>Nucleus accumbens responds to positive feedback (smiles, nods)</li>
+                            <li>ACC monitors for errors and social norm violations</li>
+                            <li>If rapport develops → oxytocin increases, cortisol decreases</li>
+                        </ul>
+                    </li>
+                    <li><strong>Post-Interview (Evaluation):</strong>
+                        <ul>
+                            <li>Hippocampus consolidates memory of the interaction</li>
+                            <li>If positive → dopamine reward, reduced cortisol</li>
+                            <li>If negative → continued cortisol, potential rumination (default mode network activation)</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h4>Psychological Factors:</h4>
+                <ul>
+                    <li><strong>First Impressions:</strong> Formed in milliseconds based on appearance, handshake, eye contact (amygdala processing)</li>
+                    <li><strong>Halo Effect:</strong> One positive trait (confidence, appearance) influences overall evaluation</li>
+                    <li><strong>Similarity Bias:</strong> Interviewers favor candidates similar to themselves</li>
+                    <li><strong>Confirmation Bias:</strong> Early impression shapes interpretation of all subsequent information</li>
+                    <li><strong>Authority Dynamics:</strong> Power differential affects both parties' behavior and neural activation</li>
+                </ul>
+
+                <h4>Optimization Strategies:</h4>
+                <ul>
+                    <li><strong>Manage cortisol:</strong> Deep breathing, positive self-talk, adequate sleep beforehand</li>
+                    <li><strong>Build rapport:</strong> Mirror interviewer's energy, find common ground, use their name</li>
+                    <li><strong>Prime confidence:</strong> Power poses before interview can reduce cortisol, increase testosterone</li>
+                    <li><strong>Tell stories:</strong> Narrative engages mirror neurons and emotional centers, making you memorable</li>
+                    <li><strong>Ask questions:</strong> Shifts dynamic from evaluated to collaborative, reduces stress response</li>
+                </ul>
+            </div>
+
+            <h3>Case Study: Long-Term Relationship Conflict</h3>
+
+            <div class="interaction-example">
+                <h4>Escalation Pattern:</h4>
+                <ol>
+                    <li><strong>Trigger:</strong> Perceived criticism or dismissiveness → amygdala activation</li>
+                    <li><strong>Stress Response:</strong> Cortisol and adrenaline spike → fight-or-flight mode</li>
+                    <li><strong>PFC Impairment:</strong> High emotion reduces rational PFC function → poor communication, saying things you'll regret</li>
+                    <li><strong>Negativity Bias:</strong> Current anger makes you recall past hurts, creating cumulative resentment</li>
+                    <li><strong>Fundamental Attribution Error:</strong> "They're being intentionally hurtful" vs. "I'm stressed and reacting poorly"</li>
+                    <li><strong>Escalation:</strong> Each person's stress response triggers the other's, creating a feedback loop</li>
+                </ol>
+
+                <h4>De-escalation Strategies:</h4>
+                <ul>
+                    <li><strong>Timeout:</strong> When cortisol is high, PFC can't function well. 20-minute break allows physiological calming</li>
+                    <li><strong>Self-soothing:</strong> Deep breathing activates parasympathetic nervous system, reducing stress response</li>
+                    <li><strong>Reframing:</strong> "What situation might explain their behavior?" (counters attribution error)</li>
+                    <li><strong>Physical touch:</strong> If both parties are willing, hand-holding releases oxytocin, reduces cortisol</li>
+                    <li><strong>Active listening:</strong> Fully understanding before responding activates empathy circuits, reduces defensive amygdala response</li>
+                    <li><strong>Positive-to-negative ratio:</strong> Research shows stable relationships maintain 5:1 ratio of positive to negative interactions (Gottman)</li>
+                </ul>
+
+                <h4>Long-Term Relationship Maintenance:</h4>
+                <ul>
+                    <li><strong>Novelty:</strong> New experiences together stimulate dopamine, replicating early relationship excitement</li>
+                    <li><strong>Physical affection:</strong> Regular touch maintains oxytocin and bonding</li>
+                    <li><strong>Gratitude:</strong> Expressing appreciation activates reward circuits and strengthens positive associations</li>
+                    <li><strong>Repair attempts:</strong> Humor, affection, or acknowledgment during conflict prevents escalation</li>
+                    <li><strong>Secure base:</strong> Being reliable and supportive strengthens secure attachment patterns</li>
+                </ul>
+            </div>
+
+            <h3>Practical Applications</h3>
+
+            <h4>Improving Communication:</h4>
+            <ul>
+                <li><strong>Manage your state first:</strong> Your cortisol level affects your perception and reaction. If stressed, delay important conversations.</li>
+                <li><strong>Start with positivity:</strong> Positive emotional tone activates approach motivation and opens communication</li>
+                <li><strong>Use "I" statements:</strong> "I feel X when Y" is less threatening than "You always..." (reduces amygdala activation in listener)</li>
+                <li><strong>Validate emotions:</strong> "That makes sense" or "I understand" activates empathy circuits and reduces defensiveness</li>
+                <li><strong>Ask questions:</strong> Genuine curiosity engages both parties' PFC and reduces emotional reactivity</li>
+            </ul>
+
+            <h4>Building Influence Ethically:</h4>
+            <ul>
+                <li><strong>Establish genuine rapport:</strong> Real connection creates oxytocin-based trust, not manipulative compliance</li>
+                <li><strong>Align interests:</strong> Show how your proposal serves others' genuine needs (activates reward system)</li>
+                <li><strong>Build credibility gradually:</strong> Consistent competence and honesty create lasting authority</li>
+                <li><strong>Respect autonomy:</strong> Providing choice increases commitment (self-determination theory)</li>
+                <li><strong>Tell authentic stories:</strong> Narratives engage emotional and empathic systems more than abstract arguments</li>
+            </ul>
+        </section>
+
+        <div class="disclaimer">
+            <h3>Educational Disclaimer</h3>
+            <p><strong>This website is for educational purposes only.</strong> The information provided represents current scientific understanding of neuroscience, psychology, and human behavior but should not be considered medical or psychological advice.</p>
+            
+            <p><strong>Important Notes:</strong></p>
+            <ul>
+                <li>Individual brains and psychological patterns vary significantly; generalizations don't apply to everyone</li>
+                <li>Mental health concerns should be addressed with qualified mental health professionals</li>
+                <li>Understanding influence techniques does not justify their unethical use</li>
+                <li>While these principles are based on peer-reviewed research, neuroscience is a rapidly evolving field</li>
+                <li>Manipulation and coercion harm relationships and violate ethical principles of respect and autonomy</li>
+            </ul>
+
+            <p><strong>Ethical Use:</strong> This knowledge should be used to better understand yourself and others, communicate more effectively, build healthier relationships, and recognize when others may be using these techniques inappropriately. Knowledge is most powerful when combined with integrity and respect for human dignity.</p>
+
+            <p><strong>Sources:</strong> Content synthesized from peer-reviewed research in neuroscience, psychology, and behavioral economics, including work by researchers such as Robert Sapolsky, Antonio Damasio, Joseph LeDoux, Robert Cialdini, Daniel Kahneman, John Gottman, and many others in the field.</p>
         </div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('atomCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        let particles = {
-            protons: 1,
-            neutrons: 0,
-            electrons: 1
-        };
-        
-        let rotation = 0;
-        
-        const elements = {
-            1: {name: 'Hydrogen', symbol: 'H'},
-            2: {name: 'Helium', symbol: 'He'},
-            3: {name: 'Lithium', symbol: 'Li'},
-            4: {name: 'Beryllium', symbol: 'Be'},
-            5: {name: 'Boron', symbol: 'B'},
-            6: {name: 'Carbon', symbol: 'C'},
-            7: {name: 'Nitrogen', symbol: 'N'},
-            8: {name: 'Oxygen', symbol: 'O'},
-            9: {name: 'Fluorine', symbol: 'F'},
-            10: {name: 'Neon', symbol: 'Ne'},
-            11: {name: 'Sodium', symbol: 'Na'},
-            12: {name: 'Magnesium', symbol: 'Mg'},
-            13: {name: 'Aluminum', symbol: 'Al'},
-            14: {name: 'Silicon', symbol: 'Si'},
-            15: {name: 'Phosphorus', symbol: 'P'},
-            16: {name: 'Sulfur', symbol: 'S'},
-            17: {name: 'Chlorine', symbol: 'Cl'},
-            18: {name: 'Argon', symbol: 'Ar'},
-            19: {name: 'Potassium', symbol: 'K'},
-            20: {name: 'Calcium', symbol: 'Ca'},
-            26: {name: 'Iron', symbol: 'Fe'},
-            29: {name: 'Copper', symbol: 'Cu'},
-            47: {name: 'Silver', symbol: 'Ag'},
-            79: {name: 'Gold', symbol: 'Au'},
-            82: {name: 'Lead', symbol: 'Pb'},
-            92: {name: 'Uranium', symbol: 'U'}
-        };
-        
-        const applications = {
-            '1-0': {
-                name: 'Protium (¹H)',
-                uses: 'Protium (¹H) is the most abundant hydrogen isotope, comprising 99.98% of natural hydrogen. Used extensively in organic chemistry, petroleum refining, ammonia production for fertilizers, and as a clean fuel source in fuel cells.'
-            },
-            '1-1': {
-                name: 'Deuterium (²H)',
-                uses: 'Deuterium is used in nuclear fusion research, NMR spectroscopy for molecular structure analysis, neutron moderation in heavy water reactors (CANDU), and as a tracer in chemical and biological research. Also used in pharmaceutical research.'
-            },
-            '1-2': {
-                name: 'Tritium (³H)',
-                uses: 'Radioactive isotope with a half-life of 12.3 years. Used in self-luminous exit signs, watch dials, fusion reactor fuel, radioluminescent devices, and as a radioactive tracer in environmental and biological studies. Important for thermonuclear weapons.'
-            },
-            '6-6': {
-                name: 'Carbon-12 (¹²C)',
-                uses: 'The standard for atomic mass units and most abundant carbon isotope (98.9%). Essential for all organic life, used in carbon dating calibration, organic chemistry, biochemistry, and as the basis for defining the mole in chemistry.'
-            },
-            '6-8': {
-                name: 'Carbon-14 (¹⁴C)',
-                uses: 'Radioactive isotope with a half-life of 5,730 years. Primary application in radiocarbon dating for archaeology and geology. Also used as a radioactive tracer in biochemical research, metabolic studies, and environmental science.'
-            },
-            '8-8': {
-                name: 'Oxygen-16 (¹⁶O)',
-                uses: 'Most abundant oxygen isotope (99.76%). Essential for respiration, combustion, and oxidation reactions. Used in water molecules, medical oxygen therapy, steel production, and chemical synthesis. Critical for life on Earth.'
-            },
-            '17-18': {
-                name: 'Chlorine-35 (³⁵Cl)',
-                uses: 'Most abundant chlorine isotope (75.8%). Used in water purification, disinfection, PVC plastic production, solvents, and pharmaceutical manufacturing. Essential for hydrochloric acid production and organic synthesis.'
-            },
-            '26-30': {
-                name: 'Iron-56 (⁵⁶Fe)',
-                uses: 'Most stable and abundant iron isotope. The backbone of steel production, used in construction, automotive manufacturing, machinery, and tools. Iron is essential for hemoglobin in blood and numerous industrial applications.'
-            },
-            '92-143': {
-                name: 'Uranium-235 (²³⁵U)',
-                uses: 'The only naturally occurring fissile isotope. Primary fuel for nuclear power plants and nuclear weapons. Undergoes nuclear fission when struck by neutrons, releasing tremendous energy. Comprises 0.72% of natural uranium.'
-            },
-            '92-146': {
-                name: 'Uranium-238 (²³⁸U)',
-                uses: 'Most abundant uranium isotope (99.3% of natural uranium). Used in breeder reactors to produce plutonium-239, depleted uranium armor and munitions, radiation shielding, and counterweights. Not directly fissile but fertile.'
-            }
-        };
-        
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-        }
-        
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-        
-        function changeParticle(type, delta) {
-            particles[type] = Math.max(0, particles[type] + delta);
-            if (type === 'protons' && particles.protons === 0) particles.protons = 1;
-            updateInfo();
-            draw();
-        }
-        
-        function updateInfo() {
-            const p = particles.protons;
-            const n = particles.neutrons;
-            const e = particles.electrons;
-            const mass = p + n;
-            const charge = p - e;
-            
-            document.getElementById('protonCount').textContent = p;
-            document.getElementById('neutronCount').textContent = n;
-            document.getElementById('electronCount').textContent = e;
-            
-            const element = elements[p] || {name: 'Unknown Element', symbol: '?'};
-            document.getElementById('elementName').textContent = element.name;
-            document.getElementById('elementSymbol').textContent = element.symbol;
-            document.getElementById('atomicNumber').textContent = p;
-            document.getElementById('massNumber').textContent = mass;
-            
-            const superscript = mass.toString().split('').map(d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]).join('');
-            document.getElementById('isotope').textContent = `${superscript}${element.symbol}`;
-            
-            const chargeEl = document.getElementById('charge');
-            if (charge > 0) {
-                chargeEl.textContent = `+${charge} (Cation)`;
-                chargeEl.className = 'charge-badge badge-positive';
-            } else if (charge < 0) {
-                chargeEl.textContent = `${charge} (Anion)`;
-                chargeEl.className = 'charge-badge badge-negative';
-            } else {
-                chargeEl.textContent = '0 (Neutral Atom)';
-                chargeEl.className = 'charge-badge badge-neutral';
-            }
-            
-            const key = `${p}-${n}`;
-            const appData = applications[key];
-            
-            if (appData) {
-                document.getElementById('isotopeInfo').textContent = appData.name;
-                document.getElementById('applications').innerHTML = `
-                    <div class="applications-title">Primary Applications</div>
-                    <div class="applications-text">${appData.uses}</div>
-                `;
-            } else {
-                document.getElementById('isotopeInfo').textContent = `${element.name}-${mass}`;
-                
-                let genericUse = '';
-                if (p === 2) genericUse = 'Helium is used in cryogenics, breathing mixtures for deep-sea diving, balloon filling, and as an inert atmosphere for welding.';
-                else if (p === 7) genericUse = 'Nitrogen is used in food preservation, fertilizer production, creating inert atmospheres, cryogenic applications, and manufacturing ammonia.';
-                else if (p === 10) genericUse = 'Neon is used in advertising signs, vacuum tubes, high-voltage indicators, lightning arrestors, and cryogenic refrigerant.';
-                else if (p === 79) genericUse = 'Gold is used in jewelry, electronics, dentistry, aerospace applications, and as a monetary standard. Excellent conductor and corrosion resistant.';
-                else if (p === 29) genericUse = 'Copper is essential for electrical wiring, plumbing, heat exchangers, and alloys like bronze and brass. Excellent electrical and thermal conductor.';
-                else if (p === 82) genericUse = 'Lead is used in batteries, radiation shielding, ammunition, and construction materials. Toxic but useful for its density and malleability.';
-                else if (charge !== 0) {
-                    if (charge > 0) {
-                        genericUse = 'This cation (positive ion) has lost electrons. Cations are important in electrolyte solutions, batteries, electroplating, and biological processes like nerve signaling.';
-                    } else {
-                        genericUse = 'This anion (negative ion) has gained electrons. Anions are crucial in salt formation, batteries, metabolism, and chemical reactions like oxidation-reduction processes.';
-                    }
-                } else {
-                    genericUse = `This ${element.name} isotope may occur naturally or be synthesized. Applications depend on its stability, half-life, and nuclear properties. Further research required for specific uses.`;
-                }
-                
-                document.getElementById('applications').innerHTML = `
-                    <div class="applications-title">General Information</div>
-                    <div class="applications-text">${genericUse}</div>
-                `;
-            }
-        }
-        
-        function draw() {
-            const w = canvas.width;
-            const h = canvas.height;
-            const cx = w / 2;
-            const cy = h / 2;
-            
-            ctx.fillStyle = '#0a0e27';
-            ctx.fillRect(0, 0, w, h);
-            
-            const nucleusRadius = 35 + Math.sqrt(particles.protons + particles.neutrons) * 4.5;
-            
-            const nucleusParticles = [];
-            const total = particles.protons + particles.neutrons;
-            for (let i = 0; i < particles.protons; i++) {
-                const angle = (i / total) * Math.PI * 2;
-                const r = nucleusRadius * 0.55 * Math.random();
-                nucleusParticles.push({
-                    x: cx + Math.cos(angle) * r,
-                    y: cy + Math.sin(angle) * r,
-                    color: '#ff6b6b',
-                    type: 'proton'
-                });
-            }
-            
-            for (let i = 0; i < particles.neutrons; i++) {
-                const angle = ((i + particles.protons) / total) * Math.PI * 2;
-                const r = nucleusRadius * 0.55 * Math.random();
-                nucleusParticles.push({
-                    x: cx + Math.cos(angle) * r,
-                    y: cy + Math.sin(angle) * r,
-                    color: '#a4b0be',
-                    type: 'neutron'
-                });
-            }
-            
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.arc(cx, cy, nucleusRadius, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            nucleusParticles.forEach(p => {
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            
-            const shells = Math.ceil(particles.electrons / 8);
-            for (let shell = 0; shell < shells; shell++) {
-                const electronRadius = nucleusRadius + 55 + (shell * 55);
-                const electronsInShell = Math.min(8, particles.electrons - (shell * 8));
-                
-                ctx.strokeStyle = 'rgba(108, 140, 219, 0.15)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([4, 4]);
-                ctx.beginPath();
-                ctx.arc(cx, cy, electronRadius, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-                
-                for (let i = 0; i < electronsInShell; i++) {
-                    const angle = (i / electronsInShell) * Math.PI * 2 + rotation + (shell * 0.4);
-                    const ex = cx + Math.cos(angle) * electronRadius;
-                    const ey = cy + Math.sin(angle) * electronRadius;
-                    
-                    ctx.fillStyle = '#6c8cdb';
-                    ctx.beginPath();
-                    ctx.arc(ex, ey, 5.5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-        }
-        
-        function animate() {
-            rotation += 0.008;
-            draw();
-            requestAnimationFrame(animate);
-        }
-        
-        updateInfo();
-        animate();
-    </script>
+    <footer>
+        <p><strong>NeuroHub</strong> - Understanding Brain, Hormones & Human Behavior</p>
+        <p>Educational Resource • Evidence-Based • Regularly Updated</p>
+        <p>&copy; 2026 NeuroHub. For educational purposes only.</p>
+    </footer>
 </body>
 </html>
